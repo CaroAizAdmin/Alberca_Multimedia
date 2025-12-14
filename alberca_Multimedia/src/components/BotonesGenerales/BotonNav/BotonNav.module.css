@@ -1,0 +1,54 @@
+.navLink {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 3.5rem; 
+    height: 3.5rem;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 1;
+}
+
+.navLink::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #2542c0 0%, #171263 100%);    
+    border-radius: 50%;
+    transform: scale(0);
+    transition: transform 0.3s ease;
+    z-index: -1; 
+}
+
+.navLink img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    z-index: 2;
+    transition: all 0.3s ease;
+    filter: brightness(0) saturate(100%) invert(18%) sepia(10%) saturate(3000%) hue-rotate(180deg) brightness(95%) contrast(90%);
+    opacity: 0.7;
+}
+
+.navLink:hover,
+.navLinkActive {
+    transform: translateY(-10px) scale(1.1); 
+    box-shadow: 0 15px 25px rgba(102, 126, 234, 0.4); 
+}
+
+.navLink:hover::before,
+.navLinkActive::before {
+    transform: scale(1);
+}
+
+.navLink:hover img,
+.navLinkActive img {
+    filter: brightness(0) invert(1);
+    opacity: 1;
+    transform: scale(1.1);
+}

@@ -1,0 +1,34 @@
+.configuracionContainer {
+    color: white;
+    max-width: 600px;
+    margin: 0 auto;
+    width: 80%;
+}
+
+.configuracionContainer h1 {
+    font-size: 1.5rem;
+}
+
+.sectionCard {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 30px;
+}
+
+.sectionCard h3 {
+    color: #ff4500;
+    margin-top: 0;
+}
+
+.sectionCard p {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 20px;
+}
+
+.btnFullWidth {
+    width: 100%;
+    margin-top: 10px;
+}

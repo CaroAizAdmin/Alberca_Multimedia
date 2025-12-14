@@ -1,35 +1,29 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from "react";
+import { Routes, Route } from "react-router-dom";
+import "./App.css";
+import Layout from "./components/Layout/Layout";
+import Inicio from "./components/Inicio/Inicio";
+import GestorEscenas from "./components/GestorEscenas/GestorEscenas";
+import Detalle from "./components/Detalle/Detalle";
+import EditarEscena from "./components/EditarEscena/EditarEscena";
+import Error404 from "./components/Error/Error404";
+import Configuracion1 from "./components/Configuracion/Configuracion1";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [escenas, setEscenas] = useState([]);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Routes>
+      <Route element={<Layout />}>
+        <Route path='/' element={<Inicio escena={escenas} setEscenas={setEscenas} />} />
+        <Route path='/configuracion' element={<Configuracion1 escena={escenas} setEscenas={setEscenas} />} />
+        <Route path='/crearEscena' element={<GestorEscenas escena={escenas} setEscenas={setEscenas} />} />
+        <Route path='/escenas/:id' element={<Detalle escena={escenas} setEscenas={setEscenas} />} />
+        <Route path='/editar-escena/:id' element={<EditarEscena escena={escenas} setEscenas={setEscenas} />} />
+      </Route>
+      <Route path='*' element={<Error404 />} />
+    </Routes>
+  );
 }
 
-export default App
+export default App;

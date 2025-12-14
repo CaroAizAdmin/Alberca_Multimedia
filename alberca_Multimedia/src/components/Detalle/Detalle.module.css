@@ -1,0 +1,226 @@
+:root {
+  --color-delete: #F65959;
+  --color-app-background: #191E3B;
+  --color-text-light: #F0F0F0;
+  --color-primary-blue: #5C97F2;
+  --color-text-faded: #B0B3CC;
+}
+
+.detalleContainer {
+  min-height: 100vh;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.detalleNavWrapper {
+  width: 100%;
+  position: absolute;
+  top: 0;
+  display: flex;
+  justify-content: center;
+  padding-top: 25px;
+  z-index: 10;
+}
+
+.centerWrapper {
+  width: 90%;
+  max-width: 60%;
+  margin-top: 0;
+}
+
+.detalleHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%;
+  max-width: 60%;
+  padding-right: 10%;
+  background: transparent;
+  backdrop-filter: none;
+  box-shadow: none;
+  position: relative;
+}
+
+.detalleCard {
+  background: rgba(45, 50, 90, 0.4);
+  backdrop-filter: blur(10px);
+  border-radius: 18px;
+  padding: 24px;
+  color: whitesmoke;
+  width: 90%;
+  box-sizing: border-box;
+  margin: 20px 0 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.detalleHero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  margin-bottom: 20px;
+  color: whitesmoke;
+}
+
+svg {
+  width: 24px;
+  height: 24px;
+}
+
+.deviceIcon {
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  transition: all 0.3s ease;
+}
+
+.deviceIcon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: all 0.3s ease;
+  opacity: 0.4;
+  filter: grayscale(100%);
+}
+
+.activeWater img {
+  opacity: 1;
+  filter: none;
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 5px #00bfff);
+}
+
+.activeLight img {
+  opacity: 1;
+  filter: none;
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 8px var(--scene-color, white));
+}
+
+.activeMusic img {
+  opacity: 1;
+  filter: none;
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 6px #d946ef);
+}
+
+.activeTemp img {
+  opacity: 1;
+  filter: none;
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 6px #f97316);
+}
+
+.activeClean img {
+  opacity: 1;
+  filter: none;
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 6px #22c55e);
+}
+
+.deviceListItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.deviceIconAndLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.dangerZone {
+  margin-top: 40px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+
+  .detalleNavWrapper {
+    padding: 25px 16px 0;
+  }
+
+  .detalleHeader {
+    max-width: 100%;
+    min-width: 0;
+    padding-right: 0;
+  }
+
+  .centerWrapper {
+    max-width: 100%;
+    padding: 0 16px 80px;
+    margin-bottom: 70px;
+    min-width: 0;
+  }
+
+  .detalleCard {
+    margin: 16px 0 0;
+    padding: 20px;
+    width: 100%;
+  }
+}
+
+.historyListContainer {
+  margin-top: 15px;
+  max-height: 200px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.historyItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.9rem;
+  color: var(--color-text-faded);
+}
+
+.historyItem:last-child {
+  border-bottom: none;
+}
+
+.historyDate {
+  color: var(--color-text-light);
+  font-weight: 500;
+}
+
+.tagType {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tagManual {
+  background: rgba(92, 151, 242, 0.2);
+  color: #5C97F2;
+  border: 1px solid rgba(92, 151, 242, 0.3);
+}
+
+.tagAuto {
+  background: rgba(255, 193, 7, 0.2);
+  color: #FFC107;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}

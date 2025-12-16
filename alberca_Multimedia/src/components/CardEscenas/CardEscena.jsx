@@ -29,42 +29,56 @@ const CardEscena = ({ id, escena }) => {
   const [showModal, setShowModal] = useState(false);
 
   const activateMutation = useMutation({
-    mutationFn: () => {
-      return fetch(`${URL_BASE}/escenas.json`)
-        .then((response) => response.json())
-        .then((allScenes) => {
-          const updates = {};
+    mutationFn: async () => {
+      // 1. Obtenemos todas las escenas
+      const response = await fetch(`${URL_BASE}/escenas.json`);
+      const allScenes = await response.json();
 
-          const newHistoryEntry = { date: new Date().toISOString(), type: 'MANUAL' };
-          const historyId = Date.now().toString();
+      const updates = {};
+      const newHistoryEntry = { date: new Date().toISOString(), type: 'MANUAL' };
+      const historyId = Date.now().toString();
 
-          if (allScenes) {
-            Object.keys(allScenes).forEach((key) => {
-              const currentScene = allScenes[key];
+      // 2. Preparamos los datos (cuál se prende y cuáles se apagan)
+      if (allScenes) {
+        Object.keys(allScenes).forEach((key) => {
+          const currentScene = allScenes[key];
 
-              if (key === id) {
-                const prevHistory = currentScene.history || {};
-                updates[key] = {
-                  ...currentScene,
-                  active: true,
-                  history: { ...(prevHistory), [historyId]: newHistoryEntry }
-                };
-              } else {
-                updates[key] = {
-                  ...currentScene,
-                  active: false
-                };
-              }
-            });
+          if (key === id) {
+            // Esta es la que activamos
+            const prevHistory = currentScene.history || {};
+            updates[key] = {
+              ...currentScene,
+              active: true,
+              history: { ...prevHistory, [historyId]: newHistoryEntry }
+            };
+          } else {
+            // Las demás se desactivan
+            updates[key] = {
+              ...currentScene,
+              active: false
+            };
           }
+        });
+      }
 
-          return fetch(`${URL_BASE}/escenas.json`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(updates),
-          });
-        })
-        .then((updateResponse) => updateResponse.json());
+      // 3. Ejecutamos las dos actualizaciones AL MISMO TIEMPO
+      
+      // A) Actualizar el array de escenas
+      const updateScenesPromise = fetch(`${URL_BASE}/escenas.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+
+      // B) Actualizar la variable "escenaActiva" en la raíz (PARA EL ESP32)
+      const updateActiveIdPromise = fetch(`${URL_BASE}/escenaActiva.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(id), // Enviamos el ID
+      });
+
+      await Promise.all([updateScenesPromise, updateActiveIdPromise]);
+      return true;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['escenas'] });

@@ -20,6 +20,7 @@ const GestorEscenas = () => {
   const [formData, setFormData] = useState({
     name: "",
     descripcion: "",
+    active: false,
     actions: {
       chorrosAgua: false,
       luces: { estado: false, color: { r: 255, g: 255, b: 255 } },

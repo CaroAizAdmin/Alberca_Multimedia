@@ -19,45 +19,59 @@ const ListadoEscenas = () => {
   });
 
   const activarEscenaMutation = useMutation({
-    mutationFn: (idParaActivar) => {
-      return fetch(`${URL_BASE}/escenas.json`)
-        .then(res => res.json())
-        .then(allScenes => {
-          const updates = {};
-          const historyId = Date.now().toString();
+    mutationFn: async (idParaActivar) => { // 1. Agregamos ASYNC aquí
+      
+      // Obtenemos todas las escenas
+      const response = await fetch(`${URL_BASE}/escenas.json`);
+      const allScenes = await response.json();
 
-          if (allScenes) {
-            Object.keys(allScenes).forEach((key) => {
-              const currentScene = allScenes[key];
-              if (key === idParaActivar) {
-                const prevHistory = currentScene.history || {};
-                updates[key] = {
-                  ...currentScene,
-                  active: true,
-                  history: {
-                    ...prevHistory,
-                    [historyId]: { date: new Date().toISOString(), type: 'AUTOMATICA' }
-                  }
-                };
-              } else {
-                updates[key] = {
-                  ...currentScene,
-                  active: false
-                };
+      const updates = {};
+      const historyId = Date.now().toString();
+
+      if (allScenes) {
+        Object.keys(allScenes).forEach((key) => {
+          const currentScene = allScenes[key];
+          if (key === idParaActivar) {
+            const prevHistory = currentScene.history || {};
+            updates[key] = {
+              ...currentScene,
+              active: true,
+              history: {
+                ...prevHistory,
+                // Mantenemos tipo AUTOMATICA
+                [historyId]: { date: new Date().toISOString(), type: 'AUTOMATICA' }
               }
-            });
+            };
+          } else {
+            updates[key] = {
+              ...currentScene,
+              active: false
+            };
           }
-
-          return fetch(`${URL_BASE}/escenas.json`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(updates),
-          });
         });
+      }
+
+      // 2. Ejecutamos ambas actualizaciones en paralelo
+      const updateScenesPromise = fetch(`${URL_BASE}/escenas.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+
+      // --- ESTO ES LO QUE FALTABA ---
+      const updateActiveIdPromise = fetch(`${URL_BASE}/escenaActiva.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(idParaActivar),
+      });
+
+      await Promise.all([updateScenesPromise, updateActiveIdPromise]);
+
+      return true;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["escenas"] });
-      console.log("🤖 Sistema: Escena activada automáticamente.");
+      console.log("🤖 Sistema: Escena activada automáticamente y ID actualizado.");
     },
     onError: () => {
       setShowModalError(true);

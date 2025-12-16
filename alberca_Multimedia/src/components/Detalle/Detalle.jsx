@@ -86,39 +86,56 @@ const Detalle = () => {
   });
 
   const activateMutation = useMutation({
-    mutationFn: () => {
-      return fetch(`${URL_BASE}/escenas.json`)
-        .then(res => res.json())
-        .then(allScenes => {
-          const updates = {};
-          const historyId = Date.now().toString();
-          const newHistoryEntry = { date: new Date().toISOString(), type: 'MANUAL' };
+    mutationFn: async () => {
+      // 1. Obtenemos todas las escenas
+      const response = await fetch(`${URL_BASE}/escenas.json`);
+      const allScenes = await response.json();
 
-          if (allScenes) {
-            Object.keys(allScenes).forEach((key) => {
-              const currentScene = allScenes[key];
-              if (key === id) {
-                const prevHistory = currentScene.history || {};
-                updates[key] = {
-                  ...currentScene,
-                  active: true,
-                  history: { ...prevHistory, [historyId]: newHistoryEntry }
-                };
-              } else {
-                updates[key] = {
-                  ...currentScene,
-                  active: false
-                };
-              }
-            });
+      const updates = {};
+      const historyId = Date.now().toString();
+      const newHistoryEntry = { date: new Date().toISOString(), type: 'MANUAL' };
+
+      // 2. Preparamos la lógica de cuál se activa y cuáles se desactivan
+      if (allScenes) {
+        Object.keys(allScenes).forEach((key) => {
+          const currentScene = allScenes[key];
+          if (key === id) {
+            // Esta es la escena que queremos activar
+            const prevHistory = currentScene.history || {};
+            updates[key] = {
+              ...currentScene,
+              active: true,
+              history: { ...prevHistory, [historyId]: newHistoryEntry }
+            };
+          } else {
+            // Las demás se desactivan
+            updates[key] = {
+              ...currentScene,
+              active: false
+            };
           }
-          return fetch(`${URL_BASE}/escenas.json`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(updates),
-          });
-        })
-        .then(res => res.json());
+        });
+      }
+
+      // 3. Ejecutamos ambas peticiones al mismo tiempo usando Promise.all
+      // Petición A: Actualiza el objeto "escenas" (Lógica existente)
+      const updateScenesPromise = fetch(`${URL_BASE}/escenas.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+
+      // Petición B: (NUEVO) Actualiza la variable "escenaActiva" en la raíz con el ID
+      const updateActiveIdPromise = fetch(`${URL_BASE}/escenaActiva.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(id), // Enviamos solo el ID como string
+      });
+
+      // Esperamos a que ambas terminen
+      await Promise.all([updateScenesPromise, updateActiveIdPromise]);
+
+      return true; 
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['escenas'] });
@@ -134,11 +151,24 @@ const Detalle = () => {
   });
 
   const deactivateMutation = useMutation({
-    mutationFn: () => fetch(`${URL_BASE}/escenas/${id}.json`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ active: false }),
-    }).then(res => res.json()),
+    mutationFn: async () => {
+        // Petición A: Apagar la escena específica dentro del array
+        const updateScenePromise = fetch(`${URL_BASE}/escenas/${id}.json`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ active: false }),
+        });
+
+        // Petición B: (NUEVO) Limpiar la variable "escenaActiva" en la raíz
+        const clearActiveIdPromise = fetch(`${URL_BASE}/escenaActiva.json`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(""), // Lo dejamos vacío
+        });
+
+        await Promise.all([updateScenePromise, clearActiveIdPromise]);
+        return true;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['escenas'] });
       queryClient.invalidateQueries({ queryKey: ['escena', id] });
@@ -152,7 +182,6 @@ const Detalle = () => {
       setShowModalError(true);
     }
   });
-
   const handleEdit = () => navigate(`/editar-escena/${id}`);
   const handleDelete = () => { setShowModalDelete(true); };
   const confirmDelete = () => { deleteMutation.mutate(); };
